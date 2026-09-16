@@ -23,3 +23,18 @@ id_ed25519
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Terraform files and local state (CRITICAL SECURITY)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
