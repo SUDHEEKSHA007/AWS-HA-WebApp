@@ -1,12 +1,18 @@
-from flask import Flask
+import os
 import socket
+from flask import Flask
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def home():
-    hostname = socket.gethostname()
+    # Fetch identity: reads INSTANCE_ID (e.g., ec2-az-a-instance-1) or defaults to system hostname
+    instance_id = os.environ.get(
+        "INSTANCE_ID", os.environ.get("HOSTNAME", socket.gethostname())
+    )
+    availability_zone = os.environ.get("AVAILABILITY_ZONE", "us-east-1a (simulated)")
+
     return f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -57,6 +63,16 @@ def home():
                 font-size: 1.1rem;
                 color: #facc15;
                 word-break: break-all;
+                margin-bottom: 1rem;
+            }}
+            .zone-badge {{
+                display: inline-block;
+                background-color: #1e1b4b;
+                color: #a5b4fc;
+                padding: 0.2rem 0.6rem;
+                border-radius: 6px;
+                font-size: 0.85rem;
+                border: 1px solid #4338ca;
             }}
         </style>
     </head>
@@ -64,10 +80,11 @@ def home():
         <div class="card">
             <h1>AWS Highly Available Web App</h1>
             <div class="badge">Application Status: Online (HTTP 200)</div>
-            <p>This web application is being served by backend instance:</p>
-            <div class="server-box">{hostname}</div>
+            <p>Served by backend instance:</p>
+            <div class="server-box">{instance_id}</div>
+            <p>Availability Zone: <span class="zone-badge">{availability_zone}</span></p>
             <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem;">
-                When behind an AWS Application Load Balancer, refresh to see load balancing across Availability Zones.
+                When behind the Application Load Balancer, refresh to observe round-robin routing across instances and zones.
             </p>
         </div>
     </body>
@@ -81,6 +98,7 @@ def health():
 
 
 if __name__ == "__main__":
-    # 0.0.0.0 binds to all available network interfaces
-    # Port 5000 is our application listening port
-    app.run(host="0.0.0.0", port=5000)
+    # Support dynamic port binding via PORT env var (default to 5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
