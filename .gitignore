@@ -1,3 +1,25 @@
+# Virtual environment
 .venv/
+venv/
+ENV/
+
+# Python bytecode & cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Environment secrets and credentials
+.env
+.env.*
+
+# Sensitive keys and certificates
+*.pem
+*.key
+*.pub
+id_rsa
+id_ed25519
+
+# OS specific files
+.DS_Store
+Thumbs.db
